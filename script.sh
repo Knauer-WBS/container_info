@@ -3,7 +3,6 @@
 
 _IDS=$(ls /etc/pve/lxc | sed 's/.conf//' )
 _VMS=$(ls /etc/pve/qemu-server | sed 's/.conf//' )
-_FLAG=false
 
 _HEAD="\e[36;4;1m"
 _SUBH="\e[95;1m"
@@ -33,9 +32,9 @@ get_hypervisor () {
         echo -e "${_LINE}PVE\t\t${_END}: ${_PVEVERSION}"
 
         if [ ! ${#_IDS} -eq 0 ]; then
-                _FLAG=true
+                local _FLAG=true
                 echo
-                _COUNT=$(echo $_IDS | sed 's/$//g' | sed 's/\n/ /' | wc -w)
+                local _COUNT=$(echo $_IDS | sed 's/$//g' | sed 's/\n/ /' | wc -w)
                 echo -e "${_LINE}LXC\t\t${_END}: ${_COUNT}"
         fi
 
@@ -58,7 +57,7 @@ get_hypervisor () {
                 else echo -e "${_LINE}Additional\t${_END}: $element"
                 fi
                 i=$(($i + 1))
-    done
+	    done
         echo
 }
 
@@ -100,9 +99,12 @@ get_network () {
 
         for element in $_IP; do
                 if [ $element == ${#_IP} ]; then break; fi
-                if [ $(echo $element | awk 'BEGIN { FS = "." } ; { print $1 }') -gt 10 ]; then echo -e "${_LINE}External\t${_END}: $element"
-                elif [ $(echo $element | awk 'BEGIN { FS = "." } ; { print $1 }') -eq 10 ]; then echo -e "${_LINE}Internal\t${_END}: $element"
-                else echo -e "${_LINE}Additional\t${_END}: $element"
+                if [ $(echo $element | awk 'BEGIN { FS = "." } ; { print $1 }') -gt 10 ]; then
+	                echo -e "${_LINE}External\t${_END}: $element"
+                elif [ $(echo $element | awk 'BEGIN { FS = "." } ; { print $1 }') -eq 10 ]; then
+	                echo -e "${_LINE}Internal\t${_END}: $element"
+                else
+	                echo -e "${_LINE}Additional\t${_END}: $element"
                 fi
 		i=$(($i + 1))
 	done 
@@ -141,3 +143,14 @@ get_status 2&> /dev/null
                 echo
         fi
 done
+
+unset _IDS
+unset _VMS
+unset _HEAD
+unset _SUBH
+unset _LINE
+unset _SUCC
+unset _FAIL
+unset _WARN
+unset _END
+unset _LIGHT
