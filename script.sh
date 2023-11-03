@@ -3,7 +3,6 @@
 
 _IDS=$(ls /etc/pve/lxc | sed 's/.conf//' )
 _VMS=$(ls /etc/pve/qemu-server | sed 's/.conf//' )
-_OUT=container_info.log
 _FLAG=false
 
 _HEAD="\e[36;4;1m"
