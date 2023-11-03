@@ -97,17 +97,29 @@ get_network () {
                 echo
         fi
 
-        for e in $_IP; do
-                if [ $e == ${#_IP} ]; then break; fi
-                if [ $(echo $e | awk 'BEGIN { FS = "." } ; { print $1 }') -gt 10 ]; then
-	                echo -e "${_LINE}External\t${_END}: $e"
-                elif [ $(echo $e | awk 'BEGIN { FS = "." } ; { print $1 }') -eq 10 ]; then
-	                echo -e "${_LINE}Internal\t${_END}: $e"
+        for element in $_IP; do
+                if [ $element == ${#_IP} ]; then break; fi
+                if [ $(echo $element | awk 'BEGIN { FS = "." } ; { print $1 }') -gt 10 ]; then
+	                echo -e "${_LINE}External\t${_END}: $element"
+                elif [ $(echo $element | awk 'BEGIN { FS = "." } ; { print $1 }') -eq 10 ]; then
+	                echo -e "${_LINE}Internal\t${_END}: $element"
                 else
-	                echo -e "${_LINE}Additional\t${_END}: $e"
+	                echo -e "${_LINE}Additional\t${_END}: $element"
                 fi
 		i=$(($i + 1))
 	done 
+}
+
+get_template () {
+	local _HOSTNAME="$(cat /etc/pve/lxc/${_ID}.conf | grep hostname | awk '{print $2}')"
+	local _OS="$(cat /etc/pve/lxc/${_ID}.conf | grep ostype | awk '{print $2}')"
+
+    echo -e "${_HEAD}> Container ${_SUCC}${_ID}${_END}"
+    echo
+    echo -e "Container ${_SUCC}${_ID}${_END} is a template!"
+	echo -e "${_LINE}Hostname\t${_END}: "${_HOSTNAME}""
+	echo -e "${_LINE}OS\t\t${_END}: "${_OS}""
+    echo
 }
 
 clear
@@ -124,11 +136,24 @@ get_status 2&> /dev/null
                 echo
         elif [ $? -eq 1 ]; then
                 if [ ! -z "$(cat /etc/pve/lxc/${_ID}.conf | grep arch)" ]; then
+	                if [ "$(cat /etc/pve/lxc/${_ID}.conf | grep template | awk '{print $2}')" == "1" ]; then
+						get_template
+                    else
                         echo -e "${_HEAD}> Container ${_WARN}${_ID}${_END}"
                         echo
-                        echo -e -n "${_WARN}Warning:${_END} Container ${_WARN}${_ID}${_END} has an issue: "
-                        pct start "${_ID}"
-                        echo
+                        echo -e -n "${_WARN}Warning:${_END} Container ${_WARN}${_ID}${_END} is not running! Attempting to start... "
+                        echo -e -n "$(pct start "${_ID}")"
+                        test $? -eq 0 && echo Success! \
+                            && echo \
+                            && get_hostname \
+                            && get_os \
+                            && get_network \
+                            && echo \
+                            && echo -e -n "Shutting down container ${_SUCC}${_ID}${_END}... " \
+                            && pct stop "${_ID}" \
+                            && test $? -eq 0 && echo Success!
+			            echo
+                    fi
                 else
                         echo -e "${_HEAD}> Container ${_FAIL}${_ID}${_END}"
                         echo
