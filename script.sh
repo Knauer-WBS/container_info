@@ -97,14 +97,14 @@ get_network () {
                 echo
         fi
 
-        for element in $_IP; do
-                if [ $element == ${#_IP} ]; then break; fi
-                if [ $(echo $element | awk 'BEGIN { FS = "." } ; { print $1 }') -gt 10 ]; then
-	                echo -e "${_LINE}External\t${_END}: $element"
-                elif [ $(echo $element | awk 'BEGIN { FS = "." } ; { print $1 }') -eq 10 ]; then
-	                echo -e "${_LINE}Internal\t${_END}: $element"
+        for e in $_IP; do
+                if [ $e == ${#_IP} ]; then break; fi
+                if [ $(echo $e | awk 'BEGIN { FS = "." } ; { print $1 }') -gt 10 ]; then
+	                echo -e "${_LINE}External\t${_END}: $e"
+                elif [ $(echo $e | awk 'BEGIN { FS = "." } ; { print $1 }') -eq 10 ]; then
+	                echo -e "${_LINE}Internal\t${_END}: $e"
                 else
-	                echo -e "${_LINE}Additional\t${_END}: $element"
+	                echo -e "${_LINE}Additional\t${_END}: $e"
                 fi
 		i=$(($i + 1))
 	done 
