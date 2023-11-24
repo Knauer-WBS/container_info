@@ -1,5 +1,4 @@
-#!/bin/bash
-#it works on my system
+set +o history
 
 _IDS=$(ls /etc/pve/lxc | sed 's/.conf//' )
 _VMS=$(ls /etc/pve/qemu-server | sed 's/.conf//' )
@@ -182,3 +181,5 @@ unset _FAIL
 unset _WARN
 unset _END
 unset _LIGHT
+
+set -o history; history -d $(history | sed -n '$s/\s*\([0-9]*\)\s*.*$/\1/p')
